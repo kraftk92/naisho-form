@@ -1,0 +1,21 @@
+/* minimal — overrides live Naisho typography */
+#naisho-form input,
+#naisho-form select,
+#naisho-form textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #aaa;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+  font-family: inherit;
+}
+
+#naisho-form button {
+  background: #d4af37;      /* Naisho gold */
+  color: #000;
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
