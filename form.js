@@ -15,6 +15,21 @@ form.innerHTML = `
     ${[1,2,3,4,5,6].map(n=>`<option>${n}</option>`).join("")}
   </select>
   <textarea name="notes"   placeholder="Comments"></textarea>
+  <label class="opt-in">
+  <label class="opt-in">
+    <input
+      type="checkbox"
+      name="marketing_opt_in"
+      value="yes"
+      checked
+    >
+    <span>
+      Keep me posted about last-minute openings, chef’s dinners & Naisho news
+    </span>
+  </label>
+  <p class="fine-print">
+    We’ll email you important reservation updates even if you uncheck the box.
+  </p>
   <button type="submit">Request Reservation</button>
 `;
 
