@@ -1,4 +1,11 @@
 /* minimal — overrides live Naisho typography */
+#naisho-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 400px;
+}
+
 #naisho-form input,
 #naisho-form select,
 #naisho-form textarea {
@@ -11,13 +18,22 @@
 }
 
 #naisho-form button {
-  background: #d4af37;      /* Naisho gold */
+  background: #D4A361;      /* Naisho gold */
   color: #000;
   font-weight: 600;
   padding: 0.75rem 1.5rem;
   border: none;
   border-radius: 6px;
   cursor: pointer;
+  transition: background 0.2s ease-in-out;
+}
+
+#naisho-form button:hover {
+  background: #BC8C4E;
+}
+
+#naisho-form select:invalid {
+  color: #999;
 }
 
 .opt-in {
@@ -26,4 +42,10 @@
 }
 .fine-print{
   font-size:.75rem; color:#666; margin-top:4px;
+}
+
+.success {
+  font-size: 18px;
+  font-weight: 600;
+  color: #0a0;
 }

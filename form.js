@@ -10,10 +10,48 @@ form.innerHTML = `
   <input name="email"      placeholder="Email"       type="email" required>
   <input name="phone"      placeholder="Phone"       required>
   <input name="date"       type="date" required>
+
+  <label for="reservation_time">Select a Time:</label>
+  <select id="reservation_time" name="reservation_time" required>
+    <option value="" disabled selected>Select a time</option>
+    <option value="4:30 PM">4:30 PM</option>
+    <option value="4:45 PM">4:45 PM</option>
+    <option value="5:00 PM">5:00 PM</option>
+    <option value="5:15 PM">5:15 PM</option>
+    <option value="5:30 PM">5:30 PM</option>
+    <option value="5:45 PM">5:45 PM</option>
+    <option value="6:00 PM">6:00 PM</option>
+    <option value="6:15 PM">6:15 PM</option>
+    <option value="6:30 PM">6:30 PM</option>
+    <option value="6:45 PM">6:45 PM</option>
+    <option value="7:00 PM">7:00 PM</option>
+    <option value="7:15 PM">7:15 PM</option>
+    <option value="7:30 PM">7:30 PM</option>
+    <option value="7:45 PM">7:45 PM</option>
+    <option value="8:00 PM">8:00 PM</option>
+    <option value="8:15 PM">8:15 PM</option>
+    <option value="8:30 PM">8:30 PM</option>
+    <option value="8:45 PM">8:45 PM</option>
+    <option value="9:00 PM">9:00 PM</option>
+    <option value="9:15 PM">9:15 PM</option>
+    <option value="9:30 PM">9:30 PM</option>
+    <option value="9:45 PM">9:45 PM</option>
+    <option value="10:00 PM">10:00 PM</option>
+    <option value="10:15 PM">10:15 PM</option>
+    <option value="10:30 PM">10:30 PM</option>
+    <option value="10:45 PM">10:45 PM</option>
+    <option value="11:00 PM">11:00 PM</option>
+    <option value="11:15 PM">11:15 PM</option>
+    <option value="11:30 PM">11:30 PM</option>
+    <option value="11:45 PM">11:45 PM</option>
+    <option value="12:00 AM">12:00 AM</option>
+  </select>
+
   <select name="party"     required>
     <option value="" disabled selected>Party size</option>
     ${[1,2,3,4,5,6].map(n=>`<option>${n}</option>`).join("")}
   </select>
+
   <textarea name="notes"   placeholder="Comments"></textarea>
   <label class="opt-in">
   <label class="opt-in">
@@ -32,6 +70,50 @@ form.innerHTML = `
   </p>
   <button type="submit">Request Reservation</button>
 `;
+
+const timeSelect = form.querySelector("#reservation_time");
+const dateInput = form.querySelector("input[name='date']");
+
+const weekdayTimes = [
+  "4:30 PM", "4:45 PM", "5:00 PM", "5:15 PM", "5:30 PM", "5:45 PM",
+  "6:00 PM", "6:15 PM", "6:30 PM", "6:45 PM",
+  "7:00 PM", "7:15 PM", "7:30 PM", "7:45 PM",
+  "8:00 PM", "8:15 PM", "8:30 PM", "8:45 PM",
+  "9:00 PM", "9:15 PM", "9:30 PM", "9:45 PM",
+  "10:00 PM", "10:15 PM", "10:30 PM"
+];
+
+const weekendTimes = [
+  "4:30 PM", "4:45 PM", "5:00 PM", "5:15 PM", "5:30 PM", "5:45 PM",
+  "6:00 PM", "6:15 PM", "6:30 PM", "6:45 PM",
+  "7:00 PM", "7:15 PM", "7:30 PM", "7:45 PM",
+  "8:00 PM", "8:15 PM", "8:30 PM", "8:45 PM",
+  "9:00 PM", "9:15 PM", "9:30 PM", "9:45 PM",
+  "10:00 PM", "10:15 PM", "10:30 PM", "10:45 PM",
+  "11:00 PM", "11:15 PM", "11:30 PM", "11:45 PM",
+  "12:00 AM"
+];
+
+function updateTimeOptions(dateStr) {
+  const date = new Date(dateStr);
+  const day = date.getDay(); // 0=Sun, 6=Sat
+
+  const isWeekend = (day === 0 || day === 5 || day === 6); // Fri, Sat, Sun
+  const timeOptions = isWeekend ? weekendTimes : weekdayTimes;
+
+  timeSelect.innerHTML = `<option value="" disabled selected>Select a time</option>`;
+  timeOptions.forEach(time => {
+    const opt = document.createElement("option");
+    opt.value = time;
+    opt.textContent = time;
+    timeSelect.appendChild(opt);
+  });
+}
+
+dateInput.addEventListener("change", (e) => {
+  updateTimeOptions(e.target.value);
+});
+
 
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
