@@ -79,23 +79,21 @@ const today   = new Date();
 const maxDate = new Date();
 maxDate.setDate(today.getDate() + FORM_CONFIG.maxDaysOut);
 
-dateInput.min = today.toISOString().slice(0, 10);
-dateInput.max = maxDate.toISOString().slice(0, 10);
+/* dateInput.min = today.toISOString().slice(0, 10);
+dateInput.max = maxDate.toISOString().slice(0, 10); */
 
-function isClosedDay(d) {
-  const day = d.getDay();        // 0=Sun … 6=Sat
-  return (day === 0 || day === 1 || day === 2);   // Sun Mon Tue
-}
-
-dateInput.addEventListener("change", (e) => {
-  const picked = new Date(e.target.value);
-  if (isClosedDay(picked)) {
-    alert("Naisho Room is closed Sun-Tue. Please choose another date.");
-    e.target.value = "";               // reset picker
-    timeSelect.innerHTML =
-      `<option value="" disabled selected>Select a time</option>`;
-  } else {
-    updateTimeOptions(e.target.value);  // refresh slots
+// Flatpickr config
+flatpickr(dateInput, {
+  altInput: true,
+  altFormat: "F j, Y",
+  dateFormat: "Y-m-d",
+  minDate: "today",
+  maxDate: new Date(Date.now() + FORM_CONFIG.maxDaysOut * 864e5),
+  disable: [
+    date => [0,1,2].includes(date.getDay())   // disable Sun (0) Mon (1) Tue (2)
+  ],
+  onChange: ([selected]) => {
+    if (selected) updateTimeOptions(selected.toISOString().slice(0,10));
   }
 });
 
@@ -124,7 +122,7 @@ function updateTimeOptions(dateStr) {
   const day  = new Date(y, m-1, d).getDay();     // 0=Sun … 6=Sat
 
   const isFriSat = (day === 5 || day === 6);
-  const timeOptions = isFriSat ? weekendTimes : midweekTimes;
+  const timeOptions = isFriSat ? weekendTimes : weekdayTimes;
 
   timeSelect.innerHTML =
     `<option value="" disabled selected>Select a time</option>`;
@@ -135,10 +133,6 @@ function updateTimeOptions(dateStr) {
     timeSelect.appendChild(opt);
   });
 }
-
-dateInput.addEventListener("change", (e) => {
-  updateTimeOptions(e.target.value);
-});
 
 
 form.addEventListener("submit", async (e) => {
