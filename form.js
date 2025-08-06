@@ -1,6 +1,8 @@
 import { FORM_CONFIG } from "./config.js";
-import flatpickr from "./vendor/flatpickr/flatpickr.esm.js";   // path is relative to form.js
-//   ^ you can also use an absolute CDN URL if you prefer
+import flatpickr from
+  'https://cdn.jsdelivr.net/gh/kraftk92/naisho-form@main/vendor/flatpickr/flatpickr.esm.js';
+
+
 
 
 const honeypotName = "website";      // spam trap
