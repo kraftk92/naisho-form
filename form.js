@@ -2,10 +2,12 @@ import { FORM_CONFIG } from "./config.js";
 /* import flatpickr from
   'https://cdn.jsdelivr.net/gh/kraftk92/naisho-form@main/vendor/flatpickr/flatpickr.esm.js'; 
 import flatpickr from
-  'https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.js?module'; */
-import flatpickr from 'https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/esm/index.js';
+  'https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.js?module'; 
+import flatpickr from 'https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/esm/index.js'; */
 
-console.log("flatpickr imported:", typeof flatpickr);
+import flatpickr from "https://esm.sh/flatpickr@4.6.13";
+
+
 
 const honeypotName = "website";      // spam trap
 const form = document.getElementById("naisho-form");
