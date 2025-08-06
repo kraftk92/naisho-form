@@ -1,9 +1,9 @@
 import { FORM_CONFIG } from "./config.js";
 /* import flatpickr from
-  'https://cdn.jsdelivr.net/gh/kraftk92/naisho-form@main/vendor/flatpickr/flatpickr.esm.js'; */
+  'https://cdn.jsdelivr.net/gh/kraftk92/naisho-form@main/vendor/flatpickr/flatpickr.esm.js'; 
 import flatpickr from
-  'https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.js?module';
-
+  'https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.js?module'; */
+import flatpickr from 'https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/esm/index.js';
 
 console.log("flatpickr imported:", typeof flatpickr);
 
