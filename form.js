@@ -74,6 +74,31 @@ form.innerHTML = `
 const timeSelect = form.querySelector("#reservation_time");
 const dateInput = form.querySelector("input[name='date']");
 
+// --- DATE PICKER: disallow Sun–Tue -----------------------------
+const today   = new Date();
+const maxDate = new Date();
+maxDate.setDate(today.getDate() + FORM_CONFIG.maxDaysOut);
+
+dateInput.min = today.toISOString().slice(0, 10);
+dateInput.max = maxDate.toISOString().slice(0, 10);
+
+function isClosedDay(d) {
+  const day = d.getDay();        // 0=Sun … 6=Sat
+  return (day === 0 || day === 1 || day === 2);   // Sun Mon Tue
+}
+
+dateInput.addEventListener("change", (e) => {
+  const picked = new Date(e.target.value);
+  if (isClosedDay(picked)) {
+    alert("Naisho Room is closed Sun-Tue. Please choose another date.");
+    e.target.value = "";               // reset picker
+    timeSelect.innerHTML =
+      `<option value="" disabled selected>Select a time</option>`;
+  } else {
+    updateTimeOptions(e.target.value);  // refresh slots
+  }
+});
+
 const weekdayTimes = [
   "4:30 PM", "4:45 PM", "5:00 PM", "5:15 PM", "5:30 PM", "5:45 PM",
   "6:00 PM", "6:15 PM", "6:30 PM", "6:45 PM",
@@ -95,18 +120,18 @@ const weekendTimes = [
 ];
 
 function updateTimeOptions(dateStr) {
-  const [y, m, d] = dateStr.split('-');        // y="2025", m="08", d="11"
-  const date      = new Date(y, m - 1, d);     // local midnight
-  const day = date.getDay(); // 0=Sun, 6=Sat
+  const [y,m,d] = dateStr.split('-');
+  const day  = new Date(y, m-1, d).getDay();     // 0=Sun … 6=Sat
 
-  const isWeekend = (day === 0 || day === 5 || day === 6); // Fri, Sat, Sun
-  const timeOptions = isWeekend ? weekendTimes : weekdayTimes;
+  const isFriSat = (day === 5 || day === 6);
+  const timeOptions = isFriSat ? weekendTimes : midweekTimes;
 
-  timeSelect.innerHTML = `<option value="" disabled selected>Select a time</option>`;
-  timeOptions.forEach(time => {
+  timeSelect.innerHTML =
+    `<option value="" disabled selected>Select a time</option>`;
+  timeOptions.forEach(t => {
     const opt = document.createElement("option");
-    opt.value = time;
-    opt.textContent = time;
+    opt.value = t;
+    opt.textContent = t;
     timeSelect.appendChild(opt);
   });
 }
