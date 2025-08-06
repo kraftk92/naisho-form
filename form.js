@@ -1,4 +1,7 @@
 import { FORM_CONFIG } from "./config.js";
+import flatpickr from "./vendor/flatpickr/flatpickr.esm.js";   // path is relative to form.js
+//   ^ you can also use an absolute CDN URL if you prefer
+
 
 const honeypotName = "website";      // spam trap
 const form = document.getElementById("naisho-form");
@@ -14,37 +17,6 @@ form.innerHTML = `
   <label for="reservation_time">Select a Time:</label>
   <select id="reservation_time" name="reservation_time" required>
     <option value="" disabled selected>Select a time</option>
-    <option value="4:30 PM">4:30 PM</option>
-    <option value="4:45 PM">4:45 PM</option>
-    <option value="5:00 PM">5:00 PM</option>
-    <option value="5:15 PM">5:15 PM</option>
-    <option value="5:30 PM">5:30 PM</option>
-    <option value="5:45 PM">5:45 PM</option>
-    <option value="6:00 PM">6:00 PM</option>
-    <option value="6:15 PM">6:15 PM</option>
-    <option value="6:30 PM">6:30 PM</option>
-    <option value="6:45 PM">6:45 PM</option>
-    <option value="7:00 PM">7:00 PM</option>
-    <option value="7:15 PM">7:15 PM</option>
-    <option value="7:30 PM">7:30 PM</option>
-    <option value="7:45 PM">7:45 PM</option>
-    <option value="8:00 PM">8:00 PM</option>
-    <option value="8:15 PM">8:15 PM</option>
-    <option value="8:30 PM">8:30 PM</option>
-    <option value="8:45 PM">8:45 PM</option>
-    <option value="9:00 PM">9:00 PM</option>
-    <option value="9:15 PM">9:15 PM</option>
-    <option value="9:30 PM">9:30 PM</option>
-    <option value="9:45 PM">9:45 PM</option>
-    <option value="10:00 PM">10:00 PM</option>
-    <option value="10:15 PM">10:15 PM</option>
-    <option value="10:30 PM">10:30 PM</option>
-    <option value="10:45 PM">10:45 PM</option>
-    <option value="11:00 PM">11:00 PM</option>
-    <option value="11:15 PM">11:15 PM</option>
-    <option value="11:30 PM">11:30 PM</option>
-    <option value="11:45 PM">11:45 PM</option>
-    <option value="12:00 AM">12:00 AM</option>
   </select>
 
   <select name="party"     required>
