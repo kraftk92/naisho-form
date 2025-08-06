@@ -3,7 +3,7 @@ import flatpickr from
   'https://cdn.jsdelivr.net/gh/kraftk92/naisho-form@main/vendor/flatpickr/flatpickr.esm.js';
 
 
-
+console.log("flatpickr imported:", typeof flatpickr);
 
 const honeypotName = "website";      // spam trap
 const form = document.getElementById("naisho-form");
