@@ -95,7 +95,8 @@ const weekendTimes = [
 ];
 
 function updateTimeOptions(dateStr) {
-  const date = new Date(dateStr);
+  const [y, m, d] = dateStr.split('-');        // y="2025", m="08", d="11"
+  const date      = new Date(y, m - 1, d);     // local midnight
   const day = date.getDay(); // 0=Sun, 6=Sat
 
   const isWeekend = (day === 0 || day === 5 || day === 6); // Fri, Sat, Sun
