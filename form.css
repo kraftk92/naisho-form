@@ -239,3 +239,43 @@ input, select, textarea{ font-size: 16px; }
   transition: background-color 9999s ease 0s; /* chrome hack */
 }
 
+/* Overlay lock during submit */
+#naisho-form{ position: relative; }
+
+.form-overlay[hidden]{ display:none !important; }
+.form-overlay{
+  position: absolute; inset: 0;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  background: rgba(5,11,22,.55);
+  backdrop-filter: blur(2px);
+  z-index: 10001;
+  opacity: 0; pointer-events: none;
+  transition: opacity .15s ease;
+}
+
+form.is-submitting + .form-overlay{
+  opacity: 1; pointer-events: auto;
+}
+
+/* Only blur the form content, not the button we’re hiding anyway */
+form.is-submitting .grid,
+form.is-submitting .details{
+  filter: blur(1px) brightness(.92);
+}
+
+/* Hide the underlying actions row so the button doesn't ghost under the overlay */
+form.is-submitting .actions{
+  visibility: hidden;   /* keeps layout height so nothing jumps */
+}
+
+/* Overlay spinner + label */
+.overlay-loader{
+  width:28px; height:28px; border-radius:50%;
+  border:3px solid rgba(255,255,255,.25);
+  border-top-color: var(--gold);
+  animation: spin .8s linear infinite;
+  margin-bottom:10px;
+}
+.overlay-text{ color: var(--muted); font-size:.95rem; }
+@keyframes spin{ to{ transform: rotate(360deg); } }
+

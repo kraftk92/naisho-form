@@ -7,6 +7,7 @@ import flatpickr from "https://esm.sh/flatpickr@4.6.13";
 const honeypotName = "website"; // spam trap
 const shell = document.getElementById("naisho-form");
 
+
 /* ---------- Markup ---------- */
 shell.innerHTML = `
   <form id="naisho-form-inner" novalidate>
@@ -74,6 +75,7 @@ shell.innerHTML = `
           <span>Text me reservation reminders</span>
         </label>
         <p class="fine-print">We will email critical reservation updates even if these are unchecked.</p>
+        <p class="fine-print">Limit: up to 3 open requests per guest at a time.</p>
       </div>
     </div>
 
@@ -84,15 +86,28 @@ shell.innerHTML = `
       </button>
       <div class="status" aria-live="polite"></div>
     </div>
+    <div class="details" aria-live="polite"></div>
+
   </form>
+  <div class="form-overlay" aria-hidden="true" hidden>
+    <div class="overlay-loader"></div>
+    <div class="overlay-text">Submitting…</div>
+  </div>
 `;
 
 const form = document.getElementById("naisho-form-inner");
+const overlay   = shell.querySelector(".form-overlay");
 const timeSelect = form.querySelector("#reservation_time");
 const dateInput  = form.querySelector("input[name='date']");
 const statusEl   = form.querySelector(".status");
 const submitBtn  = form.querySelector(".submit");
 const labelSpan  = form.querySelector(".btn-label");
+
+/* Optional details panel shim (after form exists) */
+function showDetails(html = "") {
+  const slot = form.querySelector(".details");
+  if (slot) slot.innerHTML = html;
+}
 
 /* ---------- Datepicker + time options ---------- */
 flatpickr(dateInput, {
@@ -163,7 +178,18 @@ function setLoading(on){
   submitBtn.setAttribute("aria-disabled", on ? "true" : "false");
   submitBtn.classList.toggle("is-loading", on);
   labelSpan.textContent = on ? "Processing..." : "Request reservation";
+
+  form.classList.toggle("is-submitting", on);
+  form.setAttribute("aria-busy", on ? "true" : "false");
+  if (on) form.setAttribute("inert", ""); else form.removeAttribute("inert");
+
+  // show/hide the overlay
+  if (overlay){
+    overlay.hidden = !on;
+    overlay.setAttribute("aria-hidden", on ? "false" : "true");
+  }
 }
+
 
 function showStatus(type, msg){
   statusEl.className = `status ${type}`; // success | error | info
@@ -185,6 +211,9 @@ function emailLooksValid(email){
 
 function getFormData(){
   const data = Object.fromEntries(new FormData(form));
+  data.marketing_opt_in = form.querySelector("input[name='marketing_opt_in']")?.checked ?? false;
+  data.sms_opt_in       = form.querySelector("input[name='sms_opt_in']")?.checked ?? false;
+
   // normalize
   data.email = (data.email || "").trim().toLowerCase();
   const rawDigits = (data.phone || "").replace(/\D/g, "").slice(-10);
@@ -265,28 +294,89 @@ form.addEventListener("submit", async e => {
     return;
   }
 
-  try{
+  try {
     inFlight = true;
     setLoading(true);
+
+    // Abort the request if it hangs too long
+    const controller  = new AbortController();
+    const TIMEOUT_MS  = 15000;
+    const timeoutId   = setTimeout(() => controller.abort(), TIMEOUT_MS);
+
+    let cfToken = "";
+    if (window.turnstile) {
+      try {
+        cfToken = await turnstile.execute("cf-box", { action: "reserve" });
+      } catch {}
+    }
+    data.cf_token = cfToken;
+
+
     const res = await fetch(FORM_CONFIG.webhookURL, {
       method : "POST",
       headers: { "Content-Type": "application/json" },
-      body   : JSON.stringify(data)
+      body   : JSON.stringify(data),
+      signal : controller.signal,
+    }).catch(err => {  // make sure we clear timeout even if fetch throws early
+      clearTimeout(timeoutId);
+      throw err;
     });
 
-    if (!res.ok){
-      const text = await res.text().catch(()=> "");
-      throw new Error(text || "Request failed");
+    clearTimeout(timeoutId);
+
+    // Try to parse response as JSON; fall back to text
+    const ct = res.headers.get("content-type") || "";
+    let payload = null;
+    if (ct.includes("application/json")) {
+      try { payload = await res.json(); } catch {}
+    } else {
+      try { payload = await res.text(); } catch {}
     }
 
+    const messageFromPayload = p =>
+      !p ? "" :
+      (typeof p === "string") ? p :
+      (p.message || p.error || p.detail || "");
+
+    // Treat HTTP errors OR { success:false } bodies as failures
+    const backendFailed = !res.ok || (payload && typeof payload === "object" && payload.success === false);
+
+    if (backendFailed) {
+      const msg = messageFromPayload(payload) || `Request failed (${res.status || "error"})`;
+
+      // Gate: 3 open requests
+      if (/3\s*open/i.test(msg) || (payload && payload.code === "LIMIT_REACHED")) {
+        showStatus("error", "Looks like you already have 3 open requests.");
+        if (typeof showDetails === "function") {
+          showDetails(`<span class="fine-print">To modify or cancel a request, please call or email reservations@naishoroom.com.</span>`);
+        }
+        return;
+      }
+
+      if (typeof showDetails === "function") showDetails("");
+      showStatus("error", msg || "Something went wrong.");
+      return;
+    }
+
+    // Success
     form.reset();
-    timeSelect.innerHTML = `<option value="" disabled selected>Select a time</option>`; // reset
+    timeSelect.innerHTML = `<option value="" disabled selected>Select a time</option>`;
+    if (typeof showDetails === "function") showDetails("");
     showStatus("success", "Got it. We will email you shortly.");
-  }catch(err){
+  } catch (err) {
     console.error(err);
-    showStatus("error", "Something went wrong. Please try again.");
-  }finally{
+    if (err?.name === "AbortError") {
+      showStatus("error", "Taking a bit too long—please try again.");
+    } else {
+      // Only show a generic error if nothing specific was shown already
+      if (!statusEl.textContent || statusEl.classList.contains("info")) {
+        showStatus("error", "Network error. Please try again.");
+      }
+      if (typeof showDetails === "function") showDetails("");
+    }
+  } finally {
     inFlight = false;
     setLoading(false);
   }
+
 });
