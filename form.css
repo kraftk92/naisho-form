@@ -1,61 +1,281 @@
-/* minimal — overrides live Naisho typography */
-#naisho-form {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  max-width: 400px;
-  padding: 20px;
-  border-radius:10px;
-  background-color: #07101F;
+/* =========== Theme =========== */
+:root{
+  --bg: #050B16;
+  --panel: #07101F;
+  --gold: #D4A361;
+  --gold-2: #BC8C4E;
+  --text: #E8E8E8;
+  --muted: #8A8F98;
+  --error: #ff5a5f;
+  --success: #19b36b;
+  --ring: rgba(212,163,97,0.35);
 }
 
-#naisho-form input,
-#naisho-form select,
-#naisho-form textarea {
+html,body{ height:100%; }
+body{
+  margin:0;
+  background: var(--bg);
+  color: var(--text);
+  font: 16px/1.4 system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;
+}
+
+/* =========== Page shell =========== */
+.page{
+  max-width: 980px;
+  margin: 4rem auto;
+  padding: 0 16px;
+}
+.brand{ margin-bottom: 16px; }
+.logo{ font-weight: 700; letter-spacing: 1px; margin: 0 0 4px; }
+.tag{ margin:0; color: var(--muted); font-size: .95rem; }
+
+#naisho-form{
+  background: var(--panel);
+  border-radius: 14px;
+  padding: 22px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.25);
+}
+
+/* =========== Grid =========== */
+.grid{ display: grid; gap: 16px; }
+
+/* two-column section only */
+.grid.two-col{ position: relative; }
+.grid.two-col .col{ display: grid; gap: 16px; }
+
+@media (min-width: 720px){
+  .grid.two-col{ grid-template-columns: 1fr 1fr; align-items: start; }
+  .grid.two-col .user{ position: relative; padding-right: 24px; }
+  .grid.two-col .request{ padding-left: 24px; }
+
+  /* Divider on right edge of left column */
+  .grid.two-col .user::after{
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    width: 1px;
+    background: rgba(255,255,255,0.06);
+    z-index: 0;
+  }
+
+  /* Keep children above divider */
+  .grid.two-col .user > *,
+  .grid.two-col .request > *{
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Full-width rows inside the two-col grid */
+  .span-2{ grid-column: 1 / -1; }
+}
+
+/* =========== Fields =========== */
+.field label{ display:block; font-weight:600; margin: 2px 0 6px; }
+.req{ color: var(--gold); }
+.help{ color: var(--muted); font-size: .85rem; margin-top: 6px; }
+.error{ color: var(--error); font-size: .85rem; min-height: 1em; margin-top: 6px; }
+
+input, select, textarea{
   width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #aaa;
-  border-radius: 6px;
-  margin-bottom: 1rem;
-  font-family: inherit;
+  box-sizing: border-box;
+  padding: 12px 12px;
+  background: #0A1629;
+  color: var(--text);
+  border: 1px solid #1e2a3f;
+  border-radius: 10px;
+  outline: none;
+  transition: box-shadow .15s ease, border-color .15s ease;
 }
+input:focus, select:focus, textarea:focus{
+  border-color: var(--gold);
+  box-shadow: 0 0 0 4px var(--ring);
+}
+select:invalid{ color: #9aa4b2; }
+textarea{ min-height: 96px; resize: vertical; }
 
-#naisho-form button {
-  background: #D4A361;      /* Naisho gold */
-  color: #000;
-  font-weight: 600;
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 6px;
+/* =========== Actions =========== */
+.actions{ display:flex; align-items:center; gap:16px; margin-top: 6px; }
+
+/* button.submit{
+  display:inline-flex; align-items:center; gap:10px;
+  background: var(--gold);
+  color:#000; font-weight:700; letter-spacing:.2px;
+  padding: 12px 18px;
+  border: 0; border-radius: 10px;
   cursor: pointer;
-  transition: background 0.2s ease-in-out;
+  transition: background .15s ease, transform .02s ease;
+}
+button.submit:hover{ background: var(--gold-2); }
+button.submit:active{ transform: translateY(1px); }
+button.submit[disabled]{ opacity:.7; cursor:not-allowed; } */
+
+button.submit{
+  display:inline-flex; align-items:center; gap:10px;
+  background: var(--gold);
+  color:#141414;
+  font-weight:700; letter-spacing:.15px;
+  padding:12px 18px;
+  border:1px solid rgba(0,0,0,.18);
+  border-radius:12px;
+  cursor:pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,.25), inset 0 0 0 1px rgba(255,255,255,.12);
+  transition: filter .15s ease, box-shadow .15s ease, transform .02s ease;
+}
+button.submit:hover{
+  filter: brightness(.96);
+  box-shadow: 0 6px 16px rgba(0,0,0,.32), inset 0 0 0 1px rgba(255,255,255,.16);
+}
+button.submit:focus-visible{
+  outline: none;
+  box-shadow: 0 0 0 4px var(--ring), 0 6px 16px rgba(0,0,0,.32);
+}
+button.submit:active{ transform: translateY(1px); }
+button.submit[disabled]{ opacity:.85; cursor:not-allowed; filter:saturate(.9); }
+
+/* spinner matches darker text */
+.spinner{
+  width:16px; height:16px; border-radius:50%;
+  border:2px solid rgba(20,20,20,.30);
+  border-top-color:#141414;
+  display:none;
+  animation: spin .8s linear infinite;
+}
+.is-loading .spinner{ display:inline-block; }
+@keyframes spin{ to{ transform: rotate(360deg); } }
+
+
+/* Spinner in button */
+/* .spinner{
+  width: 16px; height: 16px; border-radius: 50%;
+  border: 2px solid rgba(0,0,0,.35);
+  border-top-color: #000;
+  display: none;
+  animation: spin .8s linear infinite;
+}
+.is-loading .spinner{ display:inline-block; }
+@keyframes spin{ to{ transform: rotate(360deg); } } */
+
+/* Status line */
+.status{ min-height: 1.2em; font-size: .95rem; }
+.status.info{ color: var(--muted); }
+.status.success{ color: var(--success); }
+.status.error{ color: var(--error); }
+
+/* =========== Opt-ins =========== */
+.opt-in{ display:flex; gap:10px; align-items:center; margin: 6px 0; }
+.opt-in input[type="checkbox"]{
+  width:18px; height:18px;
+  accent-color: var(--gold);
+}
+.opt-in span{ line-height:1.2; }
+
+.fine-print{ color: var(--muted); font-size: .85rem; margin: 4px 0 0; }
+
+/* =========== Picker overlay safety =========== */
+.flatpickr-calendar{ z-index: 9999; }
+
+
+@media (max-width: 480px){
+  #naisho-form{ padding: 18px; }
+  .actions{ flex-direction: column; align-items: stretch; gap:10px; }
+  button.submit{ width: 100%; }
 }
 
-#naisho-form button:hover {
-  background: #BC8C4E;
+/* Autofill in dark mode. Kill the neon yellow on Safari/Chrome */
+input:-webkit-autofill,
+select:-webkit-autofill,
+textarea:-webkit-autofill{
+  -webkit-text-fill-color: var(--text);
+  box-shadow: 0 0 0 1000px #0A1629 inset;
+  caret-color: var(--text);
 }
 
-#naisho-form select:invalid {
-  color: #999;
+/* Invalid states */
+.field.invalid input,
+.field.invalid select,
+.field.invalid textarea{
+  border-color: var(--error);
+  box-shadow: 0 0 0 4px rgba(255,90,95,0.15);
 }
 
-.opt-in{
-  display:flex;
-  gap:8px;
-  margin:4px 0;
-  font-size:.9rem;
-  line-height:1.3;
+/* Status fade - smooths the message update without being flashy */
+.status{ min-height:1.2em; font-size:.95rem; opacity:.92; transition: opacity .2s ease, color .2s ease; }
+
+/* Reduced motion respect - don't spin if the user asked for less motion */
+@media (prefers-reduced-motion: reduce){
+  .spinner{ animation: none; }
+  *{ scroll-behavior: auto; }
 }
 
-.fine-print{
-  font-size:.75rem; 
-  color:#666; 
-  margin-top:4px;
+/* Tighten selects on iOS */
+input, select, textarea{ font-size: 16px; }
+
+/* Subtle input hover (desktop only) */
+@media (hover:hover){
+  input:hover, select:hover, textarea:hover{ border-color:#2a3854; }
 }
 
-.success{
-  font-size:1.125rem;
-  font-weight:600;
-  color:#0a0;
-  margin-top:1rem;
+/* Safer tap targets on checkboxes - slightly bigger click zone */
+.opt-in{ gap:12px; }
+.opt-in input[type="checkbox"]{ width:20px; height:20px; }
+
+/* Optional sticky actions on mobile - if the form gets longer later, pin the button */
+@media (max-width: 480px){
+  .actions{ position: sticky; bottom: env(safe-area-inset-bottom, 12px); background: linear-gradient(to top, rgba(7,16,31,.95), rgba(7,16,31,0)); padding-top: 8px; }
 }
+
+
+/* Dark-mode autofill fix, even when invalid */
+#naisho-form input:-webkit-autofill,
+#naisho-form input:-webkit-autofill:hover,
+#naisho-form input:-webkit-autofill:focus,
+#naisho-form select:-webkit-autofill,
+#naisho-form textarea:-webkit-autofill{
+  -webkit-text-fill-color: var(--text) !important;
+  box-shadow: 0 0 0 1000px #0A1629 inset !important; /* match input bg */
+  caret-color: var(--text);
+  transition: background-color 9999s ease 0s; /* chrome hack */
+}
+
+/* Overlay lock during submit */
+#naisho-form{ position: relative; }
+
+.form-overlay[hidden]{ display:none !important; }
+.form-overlay{
+  position: absolute; inset: 0;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  background: rgba(5,11,22,.55);
+  backdrop-filter: blur(2px);
+  z-index: 10001;
+  opacity: 0; pointer-events: none;
+  transition: opacity .15s ease;
+}
+
+form.is-submitting + .form-overlay{
+  opacity: 1; pointer-events: auto;
+}
+
+/* Only blur the form content, not the button we’re hiding anyway */
+form.is-submitting .grid,
+form.is-submitting .details{
+  filter: blur(1px) brightness(.92);
+}
+
+/* Hide the underlying actions row so the button doesn't ghost under the overlay */
+form.is-submitting .actions{
+  visibility: hidden;   /* keeps layout height so nothing jumps */
+}
+
+/* Overlay spinner + label */
+.overlay-loader{
+  width:28px; height:28px; border-radius:50%;
+  border:3px solid rgba(255,255,255,.25);
+  border-top-color: var(--gold);
+  animation: spin .8s linear infinite;
+  margin-bottom:10px;
+}
+.overlay-text{ color: var(--muted); font-size:.95rem; }
+@keyframes spin{ to{ transform: rotate(360deg); } }
+
